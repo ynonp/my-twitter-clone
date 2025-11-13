@@ -1,0 +1,87 @@
+<div class="container">
+  <h1>Twitter Clone Feed</h1>
+  
+  <% if logged_in? %>
+    <div class="tweet-form">
+      <h2>What's happening?</h2>
+      <%= form_with model: @tweet, url: tweets_path, local: true do |f| %>
+        <%= f.text_area :content, placeholder: "What's on your mind?", maxlength: 280, required: true %>
+        <div class="form-actions">
+          <span class="char-count" id="charCount">0 / 280</span>
+          <%= f.submit "Tweet", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+  
+  <div class="main-content">
+    <div class="tweets-section">
+      <h2>Feed</h2>
+      
+      <% if @tweets.any? %>
+        <% @tweets.each do |tweet| %>
+          <div class="tweet">
+            <div class="tweet-header">
+              <strong><%= tweet.user.username %></strong>
+              <span class="tweet-time"><%= time_ago_in_words(tweet.created_at) %> ago</span>
+            </div>
+            <div class="tweet-content">
+              <%= simple_format(tweet.content) %>
+            </div>
+            <div class="tweet-actions">
+              <% if logged_in? %>
+                <% user_retweet = current_user.retweets.find_by(tweet_id: tweet.id) %>
+                <% if user_retweet %>
+                  <%= button_to "Undo Retweet", unretweet_tweet_path(tweet), method: :delete, class: "btn btn-retweet active" %>
+                <% else %>
+                  <%= button_to "Retweet (#{tweet.retweets.count})", retweet_tweet_path(tweet), method: :post, class: "btn btn-retweet" %>
+                <% end %>
+                
+                <% if tweet.user == current_user %>
+                  <%= button_to "Delete", tweet_path(tweet), method: :delete, class: "btn btn-delete", data: { confirm: "Are you sure?" } %>
+                <% end %>
+              <% else %>
+                <span class="retweet-count">Retweets: <%= tweet.retweets.count %></span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <p class="no-tweets">No tweets yet. Be the first to tweet!</p>
+      <% end %>
+    </div>
+    
+    <% if logged_in? %>
+      <div class="sidebar">
+        <h3>Suggested Users</h3>
+        <% if @users.any? %>
+          <% @users.each do |user| %>
+            <div class="user-item">
+              <strong><%= user.username %></strong>
+              <% if current_user.following?(user) %>
+                <%= button_to "Unfollow", unfollow_user_path(user), method: :delete, class: "btn btn-small" %>
+              <% else %>
+                <%= button_to "Follow", follow_user_path(user), method: :post, class: "btn btn-small btn-primary" %>
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <p>No users to follow</p>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.querySelector('textarea[name="tweet[content]"]');
+    const charCount = document.getElementById('charCount');
+    
+    if (textarea && charCount) {
+      textarea.addEventListener('input', function() {
+        charCount.textContent = this.value.length + ' / 280';
+      });
+    }
+  });
+</script>
