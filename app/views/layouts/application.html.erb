@@ -23,6 +23,29 @@
   </head>
 
   <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <%= link_to "Twitter Clone", root_path, class: "logo" %>
+        <div class="nav-links">
+          <% if logged_in? %>
+            <span class="username">@<%= current_user.username %></span>
+            <%= button_to "Logout", logout_path, method: :delete, class: "btn btn-logout" %>
+          <% else %>
+            <%= link_to "Login", login_path, class: "btn" %>
+            <%= link_to "Sign Up", signup_path, class: "btn btn-primary" %>
+          <% end %>
+        </div>
+      </div>
+    </nav>
+    
+    <% if flash[:notice] %>
+      <div class="flash notice"><%= flash[:notice] %></div>
+    <% end %>
+    
+    <% if flash[:alert] %>
+      <div class="flash alert"><%= flash[:alert] %></div>
+    <% end %>
+    
     <%= yield %>
   </body>
 </html>
