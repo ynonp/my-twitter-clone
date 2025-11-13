@@ -1,6 +1,6 @@
 class RetweetsController < ApplicationController
   before_action :require_login
-  
+
   def create
     tweet = Tweet.find(params[:id])
     retweet = current_user.retweets.build(tweet: tweet)

@@ -1,6 +1,6 @@
 class TweetsController < ApplicationController
-  before_action :require_login, only: [:create, :destroy]
-  
+  before_action :require_login, only: [ :create, :destroy ]
+
   def index
     @tweets = Tweet.includes(:user, :retweets).all
     @tweet = Tweet.new if logged_in?
@@ -28,9 +28,9 @@ class TweetsController < ApplicationController
     end
     redirect_to root_path
   end
-  
+
   private
-  
+
   def tweet_params
     params.require(:tweet).permit(:content)
   end
